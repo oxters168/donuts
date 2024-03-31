@@ -1,4 +1,5 @@
 import p5 from 'p5'
+import _ from 'lodash'
 
 export const sketch = (p: p5) => {
   // let colorlist = ['gold', 'yellow', 'turquoise', 'red']
@@ -8,17 +9,6 @@ export const sketch = (p: p5) => {
     p.createCanvas(p.windowWidth, p.windowHeight)
     p.background(255)
     simulate()
-
-    // noFill()
-    // strokeWeight(-1)
-    // stroke('gold')
-    p.noStroke()
-    p.fill('gold')
-    p.ellipse(50, 50, 100, 100)
-    p.noFill()
-    p.stroke('black')
-    p.strokeWeight(-1)
-    p.ellipse(50, 50, 100, 100)
   }
 
   function donutator(x, y, r1, r2, f) {
@@ -31,8 +21,6 @@ export const sketch = (p: p5) => {
   function stochastic_donator(x, y, r1, r2, f) {
     const theta = p.random(0.0, 2 * Math.PI) // dono if works
     const color = colorlist[Math.round(p.random(0, 3))]
-    console.log("trees")
-    // console.log(f)
     f(color, x + r1 * Math.sin(theta), y + r1 * Math.cos(theta), r2)
   }
 
@@ -55,7 +43,6 @@ export const sketch = (p: p5) => {
     console.log(l)
     const funcs = [circulator]
     for (let i = 0; i < l.length - 1; i++) {
-      console.log("cheese")
       funcs.push((color, x, y, r) => f(x, y, l[i + 1], l[i], funcs[i]))
     }
     return funcs[funcs.length - 1]
@@ -92,12 +79,7 @@ export const sketch = (p: p5) => {
   }
   function simulate() {
     const shi = Math.min(p.windowHeight, p.windowWidth)
-    const r_list = [shi * 0.01, shi * 0.2, shi * 0.1, shi * 0.05]
-    // const r_list = [shi * 0.01, shi * 0.2]
-    // const r1 = shi * 0.1
-    // const r2 = shi * 0.2
-    // const r3 = shi * 0.01
-    // const r4 = shi * 0.05
+    const r_list = _.map([0.01, 0.2, 0.1, 0.05], x => shi * x)
     const x1 = 0.5 * p.windowWidth
     const y1 = 0.5 * p.windowHeight
     // donutator(x1, y1, r1, r2, (color, x, y, r) =>
