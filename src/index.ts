@@ -1,5 +1,5 @@
 import p5 from 'p5'
-import _ from 'lodash'
+import _ from 'lodash/fp'
 type Draw = (v: p5.Vector) => void
 type Donut = {
   innerRadius: number
@@ -29,13 +29,13 @@ export const sketch = (p: p5) => {
   function circleDonut(radius: number, d: Donut): Donut {
     if (radius > d.innerRadius + d.thickness) {
       return {
-        innerRadius: p.abs(radius - (d.innerRadius + d.thickness)),
-        thickness: (d.innerRadius + d.thickness) * 2
+        innerRadius: radius - (d.innerRadius + d.thickness),
+        thickness: (d.innerRadius + d.thickness)*2
       }
     } else if (radius < d.innerRadius) {
       return {
         innerRadius: d.innerRadius - radius,
-        thickness: d.innerRadius + radius * 2
+        thickness: d.thickness + radius * 2
       }
     } else {
       return {
@@ -47,7 +47,7 @@ export const sketch = (p: p5) => {
   function makeDonut(r1: number, r2: number): Donut {
     return {
       innerRadius: p.abs(r1-r2),
-      thickness: p.max(r1+r2 - p.abs(r1-r2), 0.1)
+      thickness: r1+r2 - p.abs(r1-r2)
     }
   }
 
@@ -63,7 +63,7 @@ export const sketch = (p: p5) => {
     return (pos) => {
       p.stroke(color ? color : colorlist[Math.round(p.random(0,3))])
       p.noFill()
-      p.strokeWeight(donut.thickness)
+      p.strokeWeight(p.max(donut.thickness, 1.0))
       p.circle(pos.x, pos.y, (donut.innerRadius + donut.thickness/2.0)*2.0)
     }
   }
@@ -90,19 +90,9 @@ export const sketch = (p: p5) => {
       f(middle)
   }
 
-  // function nater(f, l) {
-  //   l.reverse()
-  //   console.log(l)
-  //   const funcs = [circulator]
-  //   for (let i = 0; i < l.length - 1; i++) {
-  //     funcs.push((color, x, y, r) => f(x, y, l[i + 1], l[i], funcs[i]))
-  //   }
-  //   return funcs[funcs.length - 1]
-  // }
-
-  function recnator(f: Nator, l) : Draw {
+  function recnator(f: Nator, l: number[]) : Draw {
     if (l.length == 1) {
-      return drawDonut(makeDonut(l[0], l[0]))
+      return drawDonut({innerRadius: l[0], thickness: 0})
     } else if (l.length == 2)
       return drawDonut(makeDonut(l[0], l[1]))
     else
@@ -132,20 +122,14 @@ export const sketch = (p: p5) => {
     const inner = getCenterSize(r_list)
     p.ellipse(v.x, v.y, inner * 2, inner * 2)
   }
-  function drawTotalDonut(r_list) {
-    // const inner = getCenterSize(r_list)
-    // const outer = r_list.reduce((a, b) => a + b)
-    // drawDonut({innerRadius: inner, thickness: outer - inner})(p.createVector(0, 0))
-    if (r_list.length > 0) {
-      var donut = makeDonut(r_list[r_list.length - 1], 0)
-      for (let i = r_list.length - 2; i >= 0; i--)
-        donut = circleDonut(r_list[i], donut)
-      drawDonut(donut, "black" as null as p5.Color)(p.createVector())
-    }
+  function drawTotalDonut(r_list: number[]) {
+    const initialDonut: Donut = {innerRadius: _.last(r_list), thickness: 0.0}
+    const finalDonut = _.reduceRight(circleDonut, initialDonut)(r_list)
+    drawDonut(finalDonut, "black" as null as p5.Color)(p.createVector())
   }
   function simulate() {
     const shi = Math.min(p.windowHeight, p.windowWidth)
-    const r_list = _.map([0.1, 0.2, 0.02, 0.01], x => shi * x)
+    const r_list = _.map( (x : number) => shi * x)([0.01, 0.2, 0.03, 0.04])
     // const midPoint : p5.Vector = p.createVector(0.5 * p.windowWidth, 0.5 * p.windowHeight)
     // donutator({ center: midPoint, }, circulator("red", 10))
     // drawDonut({r: r_list[0], thickness: r_list[1]})(p.createVector(0,0))
