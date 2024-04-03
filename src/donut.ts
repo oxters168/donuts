@@ -53,8 +53,8 @@ export function circleDonut(radius: number, d: Donut): Donut {
 }
 
 export function drawTotalDonut(r_list: number[]) {
-    const initialDonut: Donut = { innerRadius: _.last(r_list), thickness: 0.0 }
-    const finalDonut = _.reduceRight(circleDonut, initialDonut)(r_list.slice(0, -1))
+    const initialDonut: Donut = { innerRadius: 0.0, thickness: 0.0 }
+    const finalDonut = _.reduceRight(circleDonut, initialDonut)(r_list)
     // const fixedDonut = { innerRadius: finalDonut.innerRadius, thickness: r_list.reduce((a, b) => a + b) - finalDonut.innerRadius }
     // const finalDonut = circleDonut(r_list[0], initialDonut)
     drawHQDonut(finalDonut, "#00000088" as null as p5.Color)(createVector())
