@@ -1,6 +1,6 @@
 import p5 from "p5"
 import { DrawAt, colorlist } from "./drawUtils"
-import { circulator } from "./circle"
+import { circulator, drawCircle } from "./circle"
 import _ from "lodash/fp"
 
 export type Donut = {
@@ -49,6 +49,16 @@ export function circleDonut(radius: number, d: Donut): Donut {
             innerRadius: 0,
             thickness: d.thickness + d.innerRadius + radius
         }
+    }
+}
+
+export function naiveReacherDraw(r_list: number[], color?: p5.Color) : DrawAt {
+    const angleStep = 5
+    return (origin: p5.Vector) => {
+        if (r_list.length > 1)
+            circulator(_.first(r_list), naiveReacherDraw(r_list.slice(1)), angleStep)(origin)
+        else
+            drawCircle(_.first(r_list), color)(origin)
     }
 }
 

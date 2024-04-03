@@ -1,7 +1,7 @@
 import _ from 'lodash'
 import * as p5Globals from 'p5/global'
 import { drawCircle, stochastic_circulator } from './circle'
-import { drawDonut, drawTotalDonut, makeDonut } from './donut'
+import { drawDonut, drawTotalDonut, makeDonut, naiveReacherDraw } from './donut'
 import { DrawAround, DrawAt } from './drawUtils'
 import p5 from 'p5'
 
@@ -16,6 +16,10 @@ function setup() {
   // fill("yellow")
   // stroke("black")
   // circle(0, 0, 100)
+}
+function draw() {
+  clear()
+  simulate()
 }
 
 function markovian(f: DrawAt, n_trials: number) {
@@ -33,16 +37,6 @@ function recursiveDrawAround(f: DrawAround, l: number[]): DrawAt {
     return (pos) =>
       f(l[0], recursiveDrawAround(f, l.slice(1)))(pos)
 }
-
-// function naiveReacherDraw(r_list: number[], color?: p5.Color) : DrawAt {
-//   const angleStep = 5
-//   return (origin: p5.Vector) => {
-//     if (r_list.length > 1)
-//       circulator(_.first(r_list), naiveReacherDraw(r_list.slice(1)), angleStep)(origin)
-//     else
-//       drawCircle(_.first(r_list), color)(origin)
-//   }
-// }
 
 function randomLimbs(maxNumLimbs?: number): number[] {
   if (!maxNumLimbs)
@@ -62,8 +56,8 @@ function simulate() {
   // recnator(donutator, [r1, r2, r3])(null, x1, y1, 0)
   const r_list = _.map(randomLimbs(10), (x) => shi*x)
   drawTotalDonut(r_list)
-  markovian(recursiveDrawAround(stochastic_circulator, r_list), 1000)
-  // naiveReacherDraw(r_list, 'black' as null as p5.Color)(createVector())
+  markovian(recursiveDrawAround(stochastic_circulator, r_list), 100000)
+  // naiveReacherDraw(r_list)(createVector())
   // fillCenter(midPoint, r_list)
 
   // function draw() {
@@ -71,4 +65,5 @@ function simulate() {
 
   // }
 }
-(window as any).setup = setup
+(window as any).setup = setup;
+// (window as any).draw = draw;
